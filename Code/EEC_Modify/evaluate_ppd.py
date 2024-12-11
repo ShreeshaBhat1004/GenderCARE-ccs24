@@ -14,6 +14,7 @@ import torch.nn.functional as F
 from torch.nn import CrossEntropyLoss
 from transformers.generation.utils import GenerationConfig
 
+deepspeed.utils.logging.logger.setLevel(args.deepspeed_logging_level.upper())
 
 def calculate_perplexity(text, tokenizer, model, device):
     input = tokenizer.encode(text, return_tensors="pt").to(device)
