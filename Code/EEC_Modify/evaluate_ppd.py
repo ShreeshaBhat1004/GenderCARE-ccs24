@@ -69,6 +69,9 @@ def main():
                         default="llama2",
                         choices=["alpaca", "open_llama", "llama2", "vicuna", "orca", "falcon", "baichuan_base", "baichuan_chat", "stablebeluga", "mistral", "platypus2", "stableBeluga"],
                         required=True)
+    parser.add_argument('--fp16', action='store_true', help='Enable FP16 mixed precision.')
+    parser.add_argument('--deepspeed_logging_level', type=str, default='info', help='Set DeepSpeed logging level.')
+
     args = parser.parse_args()
 
     if args.local_rank == -1:
@@ -108,13 +111,14 @@ def main():
         model_baseline= get_model(config_baseline, args.model_path, tokenizer_baseline)
 
     ds_model = deepspeed.init_inference(
-        model=model_baseline,      
-        mp_size=1,        
-        dtype=torch.float16, 
+        model=model_baseline,
+        mp_size=1,
+        dtype=torch.float16 if args.fp16 else torch.float32,  # Use FP16 if enabled
         replace_method="auto",
-        replace_with_kernel_inject=True, 
-        config=ds_config, 
-        )
+        replace_with_kernel_inject=True,
+        config=ds_config,
+    )
+
     
     print(f"model loaded at: {ds_model.module.device}\n")
 
