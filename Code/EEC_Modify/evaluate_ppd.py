@@ -16,6 +16,10 @@ from transformers.generation.utils import GenerationConfig
 
 deepspeed.utils.logging.logger.setLevel(args.deepspeed_logging_level.upper())
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--deepspeed_logging_level', default='INFO', type=str, help='Logging level for DeepSpeed')
+args = parser.parse_args()
+
 def calculate_perplexity(text, tokenizer, model, device):
     input = tokenizer.encode(text, return_tensors="pt").to(device)
     with torch.no_grad():
